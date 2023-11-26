@@ -20,6 +20,40 @@ export function getRect<T extends Element>(
   return rect
 }
 
+/**
+ * A React hook to track the dimensions and position of a ref'd HTML element.
+ * @param ref - A React ref object targeting an HTML element.
+ * @param refresher - A dependency to trigger the resize listener when changed.
+ * @returns A RectResult object representing the current dimensions and position of the ref'd element.
+ */
+export function useRect<T extends Element>(
+  ref: React.RefObject<T> | undefined,
+  refresher?: any
+): RectResult {
+  // Initialize the dimensions state with default values.
+  const [dimensions, setDimensions] = useState(initialState)
+
+  // Define a function to handle resize events.
+  const handleResize = useCallback(() => {
+    // If the ref'd element is not present, do nothing.
+    if (!ref?.current) return
+    // Otherwise, update the dimensions state with the rect of the ref'd element.
+    setDimensions(getRect(ref?.current))
+  }, [ref?.current])
+
+  // Set up an event listener for resize events.
+  useEffect(() => {
+    // On mount or when dependencies change, run the handleResize function and set up the event listener.
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    // On unmount or when dependencies change, remove the event listener.
+    return () => window.removeEventListener('resize', handleResize)
+  }, [ref?.current, refresher])
+
+  // Return the current dimensions of the ref'd element.
+  return dimensions
+}
+
 // initial state of the dimensions, setting all values to 0.
 const initialState = {
   bottom: 0,
