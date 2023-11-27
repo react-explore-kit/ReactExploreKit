@@ -1,4 +1,3 @@
-// Import necessary hooks from React
 import { useEffect, useCallback, useState } from 'react'
 
 /**
