@@ -106,3 +106,10 @@ export function inView({
       right <= windowWidth - thresholdX)
   )
 }
+
+/**
+ * Determines if a given position is horizontal (either 'left' or 'right').
+ * @param {string} pos - The position to check.
+ * @returns {boolean} - Returns true if the position is 'left' or 'right', otherwise false.
+ */
+export const isHoriz = (pos: string) => /(left|right)/.test(pos)
