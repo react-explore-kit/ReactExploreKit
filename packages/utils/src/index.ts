@@ -113,3 +113,14 @@ export function inView({
  * @returns {boolean} - Returns true if the position is 'left' or 'right', otherwise false.
  */
 export const isHoriz = (pos: string) => /(left|right)/.test(pos)
+
+/**
+ * Determines if a given value exceeds the window's width.
+ * This can be used to check if an element is positioned outside of the visible horizontal viewport.
+ * @param {number} val - The value to compare, usually representing the horizontal position or dimension of an element.
+ * @param {number} windowWidth - The current width of the window or viewport.
+ * @returns {boolean} - Returns true if the value is greater than the window's width, indicating that it is positioned outside the X (horizontal) boundary.
+ */
+export const isOutsideX = (val: number, windowWidth: number): boolean => {
+  return val > windowWidth
+}
