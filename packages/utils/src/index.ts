@@ -169,3 +169,48 @@ export function bestPositionOf(positions: PositionsObjectType): string[] {
 export type PositionsObjectType = {
   [position: string]: number
 }
+
+// Define a default padding value which will be used if no padding is provided
+const defaultPadding = 10
+
+/**
+ * Calculates padding values based on the input.
+ * The function can handle both a single number input or an array with two numbers.
+ *
+ * @param {number | [number, number]} padding - The padding value(s). This can be a single number, or an array of two numbers.
+ * @returns {[number, number]} - An array of two numbers representing the vertical and horizontal padding respectively.
+ */
+export function getPadding(
+  padding: number | [number, number] = defaultPadding
+): [number, number] {
+  // Check if the padding is provided as an array (meaning separate vertical and horizontal values are provided)
+  if (Array.isArray(padding)) {
+    // If the first value in the array is defined, use it as the vertical padding
+    if (padding[0]) {
+      // If the second value is also defined, use it as the horizontal padding
+      // If not, use the first value for both vertical and horizontal padding
+      return [padding[0], padding[1] ? padding[1] : padding[0]]
+    } else {
+      // If the first value is not defined, fall back to the default padding for both vertical and horizontal
+      return [defaultPadding, defaultPadding]
+    }
+  }
+  // If padding is a single number, use it for both vertical and horizontal padding
+  return [padding, padding]
+}
+
+/**
+ * `CoordType` is a TypeScript type that defines an array of numbers.
+ * It can represent a coordinate as a list of numeric values.
+ * For example, a point in 2D space could be represented as [10, 20].
+ */
+export type CoordType = number[]
+
+/**
+ * `CoordsObjectType` is a TypeScript type that defines an object type.
+ * This object has string keys (representing positions) and values of type `CoordType` (number arrays representing coordinates).
+ * For example, an object of this type could look like: { topLeft: [0, 0], bottomRight: [100, 100] }.
+ */
+export type CoordsObjectType = {
+  [position: string]: CoordType
+}
