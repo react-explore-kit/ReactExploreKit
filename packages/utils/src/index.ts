@@ -1,4 +1,7 @@
-import { RectResult } from './useRect'
+import Portal from './Portal'
+import Observables from './Observables'
+import { useRect, useElemRect, RectResult, getRect } from './useRect'
+import { smoothScroll } from './smoothScroll'
 
 /**
  * Ensures that a given number is not negative.
@@ -213,4 +216,14 @@ export type CoordType = number[]
  */
 export type CoordsObjectType = {
   [position: string]: CoordType
+}
+
+export {
+  Portal,
+  Observables,
+  useRect,
+  useElemRect,
+  RectResult,
+  getRect,
+  smoothScroll,
 }
