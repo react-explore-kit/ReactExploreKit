@@ -124,3 +124,14 @@ export const isHoriz = (pos: string) => /(left|right)/.test(pos)
 export const isOutsideX = (val: number, windowWidth: number): boolean => {
   return val > windowWidth
 }
+
+/**
+ * Determines if a given value exceeds the window's height.
+ * This can be used to check if an element is positioned outside of the visible vertical viewport.
+ * @param {number} val - The value to compare, usually representing the vertical position or dimension of an element.
+ * @param {number} windowHeight - The current height of the window or viewport.
+ * @returns {boolean} - Returns true if the value is greater than the window's height, indicating that it is positioned outside the Y (vertical) boundary.
+ */
+export const isOutsideY = (val: number, windowHeight: number): boolean => {
+  return val > windowHeight
+}
