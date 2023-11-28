@@ -48,3 +48,25 @@ function getInViewThreshold(threshold: InViewArgs['threshold']) {
 type InViewArgs = RectResult & {
   threshold?: { x?: number; y?: number } | number
 }
+
+/**
+ * Retrieves the current window's dimensions.
+ * @returns {Object} - An object containing the window's width (`w`) and height (`h`).
+ */
+export function getWindow(): { w: number; h: number } {
+  // Get the window's width. Use the maximum value between the document's client width and
+  // the window's inner width. If the window's inner width is undefined, default to 0.
+  const w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0
+  )
+
+  // Get the window's height in a similar way as the width.
+  const h = Math.max(
+    document.documentElement.clientHeight,
+    window.innerHeight || 0
+  )
+
+  // Return an object containing the window's dimensions.
+  return { w, h }
+}
