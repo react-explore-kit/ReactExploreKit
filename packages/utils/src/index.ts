@@ -135,3 +135,37 @@ export const isOutsideX = (val: number, windowWidth: number): boolean => {
 export const isOutsideY = (val: number, windowHeight: number): boolean => {
   return val > windowHeight
 }
+
+/**
+ * Determines the best positions based on their associated values, sorting them from highest to lowest value.
+ *
+ * @param {PositionsObjectType} positions - An object where the keys are position names (as strings) and the values are numbers representing the desirability or suitability of each position.
+ * @returns {string[]} - An array of position names sorted in descending order based on their associated values.
+ */
+export function bestPositionOf(positions: PositionsObjectType): string[] {
+  // 1. Convert the positions object into an array of objects, each containing a position name and its associated value.
+  const positionsArray = Object.keys(positions).map((p) => {
+    return {
+      position: p,
+      value: positions[p],
+    }
+  })
+
+  // 2. Sort the array in descending order based on the position values.
+  const sortedPositions = positionsArray.sort((a, b) => b.value - a.value)
+
+  // 3. Extract the position names from the sorted array.
+  const sortedPositionNames = sortedPositions.map((p) => p.position)
+
+  // 4. Return the sorted position names.
+  return sortedPositionNames
+}
+
+/**
+ * `PositionsObjectType` is a TypeScript type that defines an object type.
+ * This object has string keys (representing positions) and number values.
+ * For example, an object of this type could look like: { left: 10, top: 20 }.
+ */
+export type PositionsObjectType = {
+  [position: string]: number
+}
