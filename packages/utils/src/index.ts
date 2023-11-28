@@ -70,3 +70,39 @@ export function getWindow(): { w: number; h: number } {
   // Return an object containing the window's dimensions.
   return { w, h }
 }
+
+/**
+ * Determines if an element is in view within the current window, considering specified thresholds.
+ * @param {InViewArgs} - An object representing the element's bounding box and optional thresholds.
+ * @param {number} top - The top position of the element.
+ * @param {number} right - The right position of the element.
+ * @param {number} bottom - The bottom position of the element.
+ * @param {number} left - The left position of the element.
+ * @param {number | {x?: number, y?: number}} [threshold] - Optional thresholds to consider for in-view calculation.
+ * @returns {boolean} - True if the element is in view, false otherwise.
+ */
+
+export function inView({
+  top,
+  right,
+  bottom,
+  left,
+  threshold,
+}: InViewArgs): boolean {
+  // Retrieve the current window's dimensions.
+  const { w: windowWidth, h: windowHeight } = getWindow()
+
+  // Calculate the horizontal and vertical thresholds.
+  const { thresholdX, thresholdY } = getInViewThreshold(threshold)
+
+  // Determine if the element is in view considering the thresholds.
+  return (
+    // Case 1: The element is taller than the window and is currently covering the viewport.
+    (top < 0 && bottom - top > windowHeight) ||
+    // Case 2: The element is fully within the viewport, considering the thresholds.
+    (top >= 0 + thresholdY &&
+      left >= 0 + thresholdX &&
+      bottom <= windowHeight - thresholdY &&
+      right <= windowWidth - thresholdX)
+  )
+}
