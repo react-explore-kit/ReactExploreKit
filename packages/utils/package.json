@@ -1,5 +1,6 @@
 {
-  "version": "1.0.0",
+  "name": "@react-explore-kit/utils",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -27,7 +28,6 @@
       "pre-commit": "tsdx lint"
     }
   },
-  "name": "@react-explore-kit/utils",
   "module": "dist/utils.esm.js",
   "size-limit": [
     {
