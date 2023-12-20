@@ -166,5 +166,5 @@ export type NavButtonProps = {
   children?: any
 }
 
-// Re-exporting Position from '@reactour/popover'
+// Re-exporting Position from '@react-explore-kit/popover'
 export { Position }
