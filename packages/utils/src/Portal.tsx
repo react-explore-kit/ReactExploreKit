@@ -54,7 +54,7 @@ export type PortalProps = {
   // The React children that will be rendered inside the portal.
   children?: any
   // The tag name for the DOM node where children will be portaled to.
-  // Defaults to 'reactour-portal'.
+  // Defaults to 'react-explore-kit-portal'.
   type?: string
 }
 

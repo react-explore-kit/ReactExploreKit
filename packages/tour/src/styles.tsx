@@ -40,7 +40,7 @@ export const defaultStyles: Styles = {
   badge: () => ({
     position: 'absolute',
     fontFamily: 'monospace',
-    background: 'var(--reactour-accent,#007aff)',
+    background: 'var(--react-explore-kit-accent,#007aff)',
     height: '1.875em',
     lineHeight: 2,
     paddingLeft: '0.8125em',
@@ -97,8 +97,8 @@ export const defaultStyles: Styles = {
     transition: 'opacity 0.3s, transform 0.3s',
     cursor: disabled ? 'not-allowed' : 'pointer',
     transform: `scale(${current ? 1.25 : 1})`,
-    color: current ? 'var(--reactour-accent, #007aff)' : '#caccce',
-    background: current ? 'var(--reactour-accent, #007aff)' : 'none',
+    color: current ? 'var(--react-explore-kit-accent, #007aff)' : '#caccce',
+    background: current ? 'var(--react-explore-kit-accent, #007aff)' : 'none',
     // '&:before': {
     //   content: 'counter(dot)',
     //   position: 'absolute',
