@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react'
 import { useSizes } from './hooks'
-import { Observables, Portal } from '@react-explore-kit/utils'
+import { Observables } from '@react-explore-kit/utils'
 import Keyboard from './Keyboard'
 import Mask from '@react-explore-kit/mask'
 import Popover from '@react-explore-kit/popover'
-import { FocusScope } from '@react-aria/focus'
 import PopoverContent from './components/PopoverContent'
 import { Padding, TourProps } from './types'
 
@@ -13,6 +12,7 @@ const Tour: React.FC<TourProps> = ({
   setCurrentStep,
   setIsOpen,
   steps = [],
+  setSteps,
   styles: globalStyles = {},
   scrollSmooth,
   afterOpen,
@@ -21,21 +21,28 @@ const Tour: React.FC<TourProps> = ({
   position,
   onClickMask,
   onClickHighlighted,
+  keyboardHandler,
   className = 'react-explore-kit__popover',
   maskClassName = 'react-explore-kit__mask',
   highlightedMaskClassName,
+  clipId,
+  maskId,
   disableInteraction,
-  disableFocusLock,
+  // disableFocusLock,
   disableKeyboardNavigation,
   inViewThreshold,
   disabledActions,
   setDisabledActions,
+  disableWhenSelectorFalsy,
   rtl,
   accessibilityOptions = {
     closeButtonAriaLabel: 'Close Tour',
     showNavigationScreenReaders: true,
   },
   ContentComponent,
+  Wrapper,
+  meta,
+  setMeta,
   onTransition = () => {
     // const arr: [number, number] = [prev.x, prev.y]
     return 'center'
@@ -44,8 +51,8 @@ const Tour: React.FC<TourProps> = ({
 }) => {
   // Getting the current step's data
   const step = steps[currentStep]
-  // If the current step has specific styles, use them. If not, use global styles
-  const styles = step?.styles || globalStyles
+
+  const styles = { ...globalStyles, ...step?.styles }
 
   // Calling a custom hook `useSizes` to calculate sizes and other relevant data
   const {
@@ -74,38 +81,49 @@ const Tour: React.FC<TourProps> = ({
   }, [])
 
   const { maskPadding, popoverPadding, wrapperPadding } = getPadding(
-    step?.padding || padding
+    step?.padding ?? padding
   )
+
+  const clickProps = {
+    setCurrentStep,
+    setIsOpen,
+    currentStep,
+    setSteps,
+    steps,
+    setMeta,
+    meta,
+  }
 
   // Handling click on the mask layer
   function maskClickHandler() {
     if (!disabledActions) {
       if (onClickMask && typeof onClickMask === 'function') {
-        onClickMask({ setCurrentStep, setIsOpen, currentStep, steps })
+        onClickMask(clickProps)
       } else {
         setIsOpen(false)
       }
     }
   }
 
-  const doDisableInteraction = step?.stepInteraction
-    ? !step?.stepInteraction
-    : disableInteraction
+  const doDisableInteraction =
+    typeof step?.stepInteraction === 'boolean'
+      ? !step?.stepInteraction
+      : disableInteraction
+      ? typeof disableInteraction === 'boolean'
+        ? disableInteraction
+        : disableInteraction(clickProps)
+      : false
 
-  // Running side effects when the step changes
   useEffect(() => {
-    // If there's an action to be performed for the current step
     if (step?.action && typeof step?.action === 'function') {
       step?.action(target)
     }
 
-    // If the current step requires some actions to be disabled
     if (step?.disableActions !== undefined) {
       setDisabledActions(step?.disableActions)
     }
 
     return () => {
-      // An action to be performed after the current step
       if (step?.actionAfter && typeof step?.actionAfter === 'function') {
         step?.actionAfter(target)
       }
@@ -118,25 +136,28 @@ const Tour: React.FC<TourProps> = ({
     ? step?.position
     : position
 
+  const TourWrapper = Wrapper ? Wrapper : React.Fragment
+
   return step ? (
-    <Portal>
-      <FocusManager disabled={disableFocusLock}>
-        <Observables
-          mutationObservables={step?.mutationObservables}
-          resizeObservables={step?.resizeObservables}
-          refresh={observableRefresher}
-        />
+    <TourWrapper>
+      <Observables
+        mutationObservables={step?.mutationObservables}
+        resizeObservables={step?.resizeObservables}
+        refresh={observableRefresher}
+      />
 
-        <Keyboard
-          setCurrentStep={setCurrentStep}
-          currentStep={currentStep}
-          setIsOpen={setIsOpen}
-          stepsLength={steps.length}
-          disableKeyboardNavigation={disableKeyboardNavigation}
-          disable={disabledActions}
-          rtl={rtl}
-        />
-
+      <Keyboard
+        setCurrentStep={setCurrentStep}
+        currentStep={currentStep}
+        setIsOpen={setIsOpen}
+        stepsLength={steps.length}
+        disableKeyboardNavigation={disableKeyboardNavigation}
+        disable={disabledActions}
+        rtl={rtl}
+        clickProps={clickProps}
+        keyboardHandler={keyboardHandler}
+      />
+      {(!disableWhenSelectorFalsy || target) && (
         <Mask
           sizes={transition ? initialState : sizes}
           onClick={maskClickHandler}
@@ -150,10 +171,18 @@ const Tour: React.FC<TourProps> = ({
           padding={transition ? 0 : maskPadding}
           highlightedAreaClassName={highlightedMaskClassName}
           className={maskClassName}
-          onClickHighlighted={onClickHighlighted}
+          onClickHighlighted={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            if (onClickHighlighted)
+              onClickHighlighted((e as unknown) as MouseEvent, clickProps)
+          }}
           wrapperPadding={wrapperPadding}
+          clipId={clipId}
+          maskId={maskId}
         />
-
+      )}
+      {(!disableWhenSelectorFalsy || target) && (
         <Popover
           sizes={sizes}
           styles={styles}
@@ -184,41 +213,27 @@ const Tour: React.FC<TourProps> = ({
               currentStep={currentStep}
               setIsOpen={setIsOpen}
               steps={steps}
+              setSteps={setSteps}
               accessibilityOptions={accessibilityOptions}
               disabledActions={disabledActions}
               transition={transition}
               isHighlightingObserved={isHighlightingObserved}
               rtl={rtl}
+              meta={meta}
+              setMeta={setMeta}
               {...popoverProps}
             />
           )}
         </Popover>
-      </FocusManager>
-    </Portal>
+      )}
+    </TourWrapper>
   ) : null
 }
 
 export default Tour
 
-type FocusProps = {
-  disabled?: boolean
-  children?: any
-}
-
-// The FocusManager component is responsible for managing keyboard focus within the tour
-const FocusManager: React.FC<FocusProps> = ({ disabled, children }) => {
-  // If 'disabled' prop is true, render the children directly without any focus management
-  return disabled ? (
-    <>{children}</>
-  ) : (
-    // If 'disabled' prop is false, wrap the children inside a FocusScope to manage focus
-    <FocusScope contain autoFocus restoreFocus>
-      {children}
-    </FocusScope>
-    // 'contain' prop ensures that the focus is trapped within the FocusScope
-    // 'autoFocus' prop automatically focuses the first focusable element inside the FocusScope
-    // 'restoreFocus' prop ensures that focus is restored back to the element that had focus before the FocusScope was mounted, once it is unmounted
-  )
+export interface CustomCSS extends React.CSSProperties {
+  rx: number
 }
 
 // The getPadding function is used to handle padding values for different parts of the tour component.

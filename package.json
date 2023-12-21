@@ -1,6 +1,7 @@
 {
   "name": "react-explore-kit",
   "version": "1.0.1",
+  "private": true,
   "description": "",
   "scripts": {
     "build": "turbo run build",
@@ -29,7 +30,8 @@
     "eslint-config-prettier": "8.5.0",
     "launchit": "1.1.2",
     "turbo": "^1.10.16",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "rollup-plugin-postcss": "^4.0.2"
   },
   "keywords": [],
   "author": "",

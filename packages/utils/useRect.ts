@@ -1,4 +1,5 @@
 import { useEffect, useCallback, useState } from 'react'
+import { RectResult } from './types'
 
 /**
  * A utility function to get the DOMRect of an HTML element.
@@ -93,16 +94,4 @@ const initialState = {
   width: 0,
   x: 0,
   y: 0,
-}
-
-// RectResult type, representing the dimensions and position of an HTML element.
-export type RectResult = {
-  bottom: number
-  height: number
-  left: number
-  right: number
-  top: number
-  width: number
-  x: number
-  y: number
 }

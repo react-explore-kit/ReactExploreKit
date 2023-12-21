@@ -1,0 +1,9 @@
+/* .react-explore-kit__close-button {
+  color: var(--rt-close-btn);
+}
+.react-explore-kit__close-button:hover {
+  color: var(--rt-close-btn-disabled);
+} */
+.react-explore-kit__close-button svg {
+  display: block;
+}

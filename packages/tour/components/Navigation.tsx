@@ -1,4 +1,9 @@
-import React, { Dispatch, ComponentType } from 'react'
+import React, {
+  ReactNode,
+  Dispatch,
+  ComponentType,
+  // PropsWithChildren,
+} from 'react'
 import { StylesObj, stylesMatcher } from '../styles'
 import { StepType, BtnFnProps, NavButtonProps } from '../types'
 
@@ -92,6 +97,7 @@ const Navigation: React.FC<NavigationProps> = ({
             currentStep,
             stepsLength,
             setIsOpen,
+            steps,
           })
         ) : (
           <Button kind="prev" />
@@ -100,7 +106,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
       {!hideDots && (
         <div style={getStyles('navigation', {})}>
-          {Array.from({ length: stepsLength }, (_, i) => i).map((index) => {
+          {Array.from({ length: stepsLength }, (_, i) => i).map(index => {
             return (
               <button
                 style={getStyles('dot', {
@@ -120,17 +126,20 @@ const Navigation: React.FC<NavigationProps> = ({
         </div>
       )}
 
-      {!hideButtons && nextButton && typeof nextButton === 'function' ? (
-        nextButton({
-          Button,
-          setCurrentStep,
-          currentStep,
-          stepsLength,
-          setIsOpen,
-        })
-      ) : (
-        <Button />
-      )}
+      {!hideButtons ? (
+        nextButton && typeof nextButton === 'function' ? (
+          nextButton({
+            Button,
+            setCurrentStep,
+            currentStep,
+            stepsLength,
+            setIsOpen,
+            steps,
+          })
+        ) : (
+          <Button />
+        )
+      ) : null}
     </div>
   )
 }
@@ -144,8 +153,8 @@ export type NavigationProps = BaseProps & {
   steps: StepType[]
   currentStep: number
   disableDots?: boolean
-  nextButton?: (props: BtnFnProps) => React.ReactNode | null | undefined
-  prevButton?: (props: BtnFnProps) => React.ReactNode | null | undefined
+  nextButton?: (props: BtnFnProps) => ReactNode | null
+  prevButton?: (props: BtnFnProps) => ReactNode | null
   setIsOpen: Dispatch<React.SetStateAction<Boolean>>
   hideButtons?: boolean
   hideDots?: boolean

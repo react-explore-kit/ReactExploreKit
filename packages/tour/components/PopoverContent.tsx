@@ -24,12 +24,16 @@ const PopoverContent: React.FC<PopoverContentProps> = ({
   showNavigation = true,
   showBadge = true,
   showDots = true,
+  meta,
+  setMeta,
+  setSteps,
 }) => {
   // Getting the current step object based on the currentStep index.
   const step = steps[currentStep]
   // Merging default components with any custom components provided through props.
-  const { Badge, Close, Content, Navigation, Arrow } =
-    defaultComponents(components)
+  const { Badge, Close, Content, Navigation, Arrow } = defaultComponents(
+    components
+  )
 
   // Handling badge content, it could be a function or a simple value.
   const badge =
@@ -45,19 +49,25 @@ const PopoverContent: React.FC<PopoverContentProps> = ({
   function closeClickHandler() {
     if (!disabledActions) {
       if (onClickClose && typeof onClickClose === 'function') {
-        onClickClose({ setCurrentStep, setIsOpen, currentStep })
+        onClickClose({
+          setCurrentStep,
+          setIsOpen,
+          currentStep,
+          steps,
+          meta,
+          setMeta,
+          setSteps,
+        })
       } else {
         setIsOpen(false)
       }
     }
   }
 
-  // Rendering the popover content.
   return (
     <React.Fragment>
-      {/* Rendering the badge, if enabled. */}
       {showBadge ? <Badge styles={styles}>{badge}</Badge> : null}
-      {/* Rendering the close button, if enabled. */}
+
       {showCloseButton ? (
         <Close
           styles={styles}
@@ -66,7 +76,7 @@ const PopoverContent: React.FC<PopoverContentProps> = ({
           onClick={closeClickHandler}
         />
       ) : null}
-      {/* Rendering the main content. */}
+
       <Content
         content={step?.content}
         setCurrentStep={setCurrentStep}
@@ -75,7 +85,7 @@ const PopoverContent: React.FC<PopoverContentProps> = ({
         isHighlightingObserved={isHighlightingObserved}
         setIsOpen={setIsOpen}
       />
-      {/* Rendering the navigation controls, if enabled. */}
+
       {showNavigation ? (
         <Navigation
           setCurrentStep={setCurrentStep}

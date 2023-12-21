@@ -20,6 +20,16 @@ let initialState = {
   y: 0,
 }
 
+type ScrollLogicalPosition = 'center' | 'end' | 'nearest' | 'start'
+
+type ScrollBehavior = 'auto' | 'smooth'
+
+type ScrollIntoViewOptions = {
+  behavior?: ScrollBehavior
+  block?: ScrollLogicalPosition
+  inline?: ScrollLogicalPosition
+}
+
 /**
  * Custom React hook that computes and responds to the size and position of
  * an element specified by the step, and also manages smooth scrolling into view.

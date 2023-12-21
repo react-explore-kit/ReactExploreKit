@@ -10,6 +10,15 @@ module.exports = {
   parserOptions: {
     // project: true,
     tsconfigRootDir: __dirname,
+    ecmaVersion: 6,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+  env: {
+    browser: true,
+    es6: true,
   },
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',

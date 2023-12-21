@@ -25,7 +25,6 @@ export const defaultStyles: Styles = {
   popover: () => ({
     position: 'fixed',
     maxWidth: 353,
-    // minWidth: 150, // this line is commented out and won't affect the style.
     backgroundColor: '#fff',
     padding: '24px 30px',
     boxShadow: '0 0.5em 3em rgba(0, 0, 0, 0.3)',

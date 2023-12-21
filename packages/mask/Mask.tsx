@@ -134,8 +134,8 @@ export type MaskProps = {
   styles?: StylesObj
   className?: string
   highlightedAreaClassName?: string
-  padding?: number | [number, number]
-  wrapperPadding?: number | [number, number]
+  padding?: number | number[]
+  wrapperPadding?: number | number[]
   onClick?: MouseEventHandler<HTMLDivElement>
   onClickHighlighted?: MouseEventHandler<SVGRectElement>
   maskId?: string
@@ -146,5 +146,10 @@ export default Mask
 
 // Function to generate a unique ID based on a prefix.
 function uniqueId(prefix: string) {
-  return prefix + Math.random().toString(36).substring(2, 16)
+  return (
+    prefix +
+    Math.random()
+      .toString(36)
+      .substring(2, 16)
+  )
 }

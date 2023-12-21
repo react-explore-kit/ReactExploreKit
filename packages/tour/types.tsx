@@ -1,4 +1,4 @@
-import { Dispatch, MouseEventHandler, ReactElement, ComponentType } from 'react'
+import { ReactNode, Dispatch, ReactElement, ComponentType } from 'react'
 import {
   Position,
   PopoverStylesObj,
@@ -10,36 +10,45 @@ import { PopoverComponentsType } from './components/index'
 import { StylesObj } from './styles'
 
 // SharedProps: Type defining common props used across different components
-type SharedProps = {
+type SharedProps = KeyboardHandler & {
   steps: StepType[]
   styles?: StylesObj & PopoverStylesObj & MaskStylesObj
   padding?: Padding
   position?: Position
-  disableInteraction?: boolean
+  disableInteraction?:
+    | boolean
+    | ((
+        clickProps: Pick<ClickProps, 'currentStep' | 'steps' | 'meta'>
+      ) => boolean)
   disableFocusLock?: boolean
   disableDotsNavigation?: boolean
   disableKeyboardNavigation?: boolean | KeyboardParts[]
   className?: string
   maskClassName?: string
   highlightedMaskClassName?: string
-  nextButton?: (props: BtnFnProps) => React.ReactNode | null | undefined
-  prevButton?: (props: BtnFnProps) => React.ReactNode | null | undefined
+  maskId?: string
+  clipId?: string
+  nextButton?: (props: BtnFnProps) => ReactNode | null
+  prevButton?: (props: BtnFnProps) => ReactNode | null
   afterOpen?: (target: Element | null) => void
   beforeClose?: (target: Element | null) => void
   onClickMask?: (clickProps: ClickProps) => void
   onClickClose?: (clickProps: ClickProps) => void
-  onClickHighlighted?: MouseEventHandler<SVGRectElement>
+  onClickHighlighted?: (e: MouseEvent, clickProps: ClickProps) => void
+  //  MouseEventHandler<SVGRectElement>
   badgeContent?: (badgeProps: BadgeProps) => any
   showNavigation?: boolean
   showPrevNextButtons?: boolean
   showCloseButton?: boolean
   showBadge?: boolean
+  showDots?: boolean
   scrollSmooth?: boolean
   inViewThreshold?: number | { x?: number; y?: number }
   accessibilityOptions?: A11yOptions
   rtl?: boolean
   components?: PopoverComponentsType
   ContentComponent?: ComponentType<PopoverContentProps>
+  Wrapper?: ComponentType
 }
 
 // PopoverContentProps: Type defining props for the PopoverContent component
@@ -56,15 +65,18 @@ export type PopoverContentProps = {
   isHighlightingObserved?: boolean
   setIsOpen: Dispatch<React.SetStateAction<Boolean>>
   steps: StepType[]
+  setSteps?: Dispatch<React.SetStateAction<StepType[]>>
   showNavigation?: boolean
   showPrevNextButtons?: boolean
   showCloseButton?: boolean
   showBadge?: boolean
   showDots?: boolean
-  nextButton?: (props: BtnFnProps) => React.ReactNode | null | undefined
-  prevButton?: (props: BtnFnProps) => React.ReactNode | null | undefined
+  nextButton?: (props: BtnFnProps) => ReactNode | null
+  prevButton?: (props: BtnFnProps) => ReactNode | null
   disableDotsNavigation?: boolean
   rtl?: boolean
+  meta?: string
+  setMeta?: Dispatch<React.SetStateAction<string>>
 }
 
 // A11yOptions: Type defining accessibility options for screen readers
@@ -75,7 +87,7 @@ type A11yOptions = {
 }
 
 // Padding: Type defining padding options, either as a number or an object with specific paddings
-type ComponentPadding = number | [number, number]
+type ComponentPadding = number | number[]
 export type Padding =
   | number
   | {
@@ -88,25 +100,41 @@ export type Padding =
 export type KeyboardParts = 'esc' | 'left' | 'right'
 
 // ClickProps: Type defining props for click events, including set state actions and current step
-type ClickProps = {
+export type ClickProps = {
   setIsOpen: Dispatch<React.SetStateAction<Boolean>>
   setCurrentStep: Dispatch<React.SetStateAction<number>>
   currentStep: number
   steps?: StepType[]
+  setSteps?: Dispatch<React.SetStateAction<StepType[]>>
+  meta?: string
+  setMeta?: Dispatch<React.SetStateAction<string>>
+}
+
+export type KeyboardHandler = {
+  keyboardHandler?: (
+    e: KeyboardEvent,
+    clickProps?: ClickProps,
+    status?: {
+      isEscDisabled?: boolean
+      isRightDisabled?: boolean
+      isLeftDisabled?: boolean
+    }
+  ) => void
 }
 
 // TourProps: Type extending SharedProps and ClickProps for the main Tour component
 export type TourProps = SharedProps &
   ClickProps & {
     isOpen: Boolean
-    setSteps: Dispatch<React.SetStateAction<StepType[]>>
     disabledActions: boolean
+    disableWhenSelectorFalsy?: boolean
     setDisabledActions: Dispatch<React.SetStateAction<boolean>>
     onTransition?: (
       postionsProps: PositionProps,
       prev: RectResult
     ) => 'top' | 'right' | 'bottom' | 'left' | 'center' | [number, number]
   }
+
 // BadgeProps: Type defining props for the Badge component, including total steps and current step
 type BadgeProps = {
   totalSteps: number
@@ -121,6 +149,8 @@ export type ProviderProps = SharedProps & {
   startAt?: number
   setCurrentStep?: Dispatch<React.SetStateAction<number>>
   currentStep?: number
+  meta?: string
+  setMeta?: Dispatch<React.SetStateAction<string>>
 }
 
 // ContentProps: Type defining props for content rendering, including set state actions and current step
@@ -134,7 +164,7 @@ export type ContentProps = {
 // StepType: Type defining a step in the tour guide, including selector, content, position, etc.
 export type StepType = {
   selector: string | Element
-  content: ReactElement | string | ((props: ContentProps) => void)
+  content: ReactElement | string | ((props: PopoverContentProps) => void)
   position?: Position
   highlightedSelectors?: string[]
   mutationObservables?: string[]
@@ -151,11 +181,12 @@ export type StepType = {
 
 // BtnFnProps: Type defining props for the Next and Previous button functions
 export type BtnFnProps = {
-  Button: React.FC<NavButtonProps> // React functional component for the navigation button
+  Button: React.FC<React.PropsWithChildren<NavButtonProps>>
   setCurrentStep: Dispatch<React.SetStateAction<number>>
   stepsLength: number
   currentStep: number
   setIsOpen: Dispatch<React.SetStateAction<Boolean>>
+  steps?: StepType[]
 }
 
 // NavButtonProps: Type defining props for the navigation button components
@@ -166,5 +197,4 @@ export type NavButtonProps = {
   children?: any
 }
 
-// Re-exporting Position from '@react-explore-kit/popover'
-export { Position }
+export type { Position, StylesObj }

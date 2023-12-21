@@ -1,7 +1,4 @@
-import Portal from './Portal'
-import Observables from './Observables'
-import { useRect, useElemRect, RectResult, getRect } from './useRect'
-import { smoothScroll } from './smoothScroll'
+import { InViewArgs, PositionsObjectType } from './types'
 
 /**
  * Ensures that a given number is not negative.
@@ -25,7 +22,7 @@ export function safe(sum: number): number {
  * @returns {{ thresholdX: number, thresholdY: number }} An object containing threshold values for X and Y axes.
  */
 
-function getInViewThreshold(threshold: InViewArgs['threshold']) {
+export function getInViewThreshold(threshold: InViewArgs['threshold']) {
   // Check if the threshold is an object and not null
   if (typeof threshold === 'object' && threshold !== null) {
     // If it's an object, return an object with thresholdX and thresholdY properties.
@@ -42,14 +39,6 @@ function getInViewThreshold(threshold: InViewArgs['threshold']) {
     thresholdX: threshold || 0,
     thresholdY: threshold || 0,
   }
-}
-
-/**
- * Type definition for the arguments of inView function.
- */
-
-type InViewArgs = RectResult & {
-  threshold?: { x?: number; y?: number } | number
 }
 
 /**
@@ -139,41 +128,51 @@ export const isOutsideY = (val: number, windowHeight: number): boolean => {
   return val > windowHeight
 }
 
-/**
- * Determines the best positions based on their associated values, sorting them from highest to lowest value.
- *
- * @param {PositionsObjectType} positions - An object where the keys are position names (as strings) and the values are numbers representing the desirability or suitability of each position.
- * @returns {string[]} - An array of position names sorted in descending order based on their associated values.
- */
-export function bestPositionOf(positions: PositionsObjectType): string[] {
-  // 1. Convert the positions object into an array of objects, each containing a position name and its associated value.
-  const positionsArray = Object.keys(positions).map((p) => {
-    return {
-      position: p,
-      value: positions[p],
-    }
-  })
+// /**
+//  * Determines the best positions based on their associated values, sorting them from highest to lowest value.
+//  *
+//  * @param {PositionsObjectType} positions - An object where the keys are position names (as strings) and the values are numbers representing the desirability or suitability of each position.
+//  * @returns {string[]} - An array of position names sorted in descending order based on their associated values.
+//  */
+// export function bestPositionOf(positions: PositionsObjectType): string[] {
+//   // 1. Convert the positions object into an array of objects, each containing a position name and its associated value.
+//   const positionsArray = Object.keys(positions).map(p => {
+//     return {
+//       position: p,
+//       value: positions[p],
+//     }
+//   })
 
-  // 2. Sort the array in descending order based on the position values.
-  const sortedPositions = positionsArray.sort((a, b) => b.value - a.value)
+//   // 2. Sort the array in descending order based on the position values.
+//   const sortedPositions = positionsArray.sort((a, b) => b.value - a.value)
 
-  // 3. Extract the position names from the sorted array.
-  const sortedPositionNames = sortedPositions.map((p) => p.position)
+//   // 3. Extract the position names from the sorted array.
+//   const sortedPositionNames = sortedPositions.map(p => p.position)
 
-  // 4. Return the sorted position names.
-  return sortedPositionNames
+//   // 4. Return the sorted position names.
+//   return sortedPositionNames
+// }
+
+export function bestPositionOf(
+  positions: PositionsObjectType,
+  filters: string[] = []
+): string[] {
+  const compareFn = (a: string, b: string) =>
+    filters.includes(a) ? 1 : filters.includes(b) ? -1 : 0
+  return Object.keys(positions)
+    .map(p => {
+      return {
+        position: p,
+        value: positions[p],
+      }
+    })
+    .sort((a, b) => b.value - a.value)
+    .sort((a, b) => compareFn(a.position, b.position))
+    .filter(p => p.value > 0)
+    .map(p => p.position)
 }
 
-/**
- * `PositionsObjectType` is a TypeScript type that defines an object type.
- * This object has string keys (representing positions) and number values.
- * For example, an object of this type could look like: { left: 10, top: 20 }.
- */
-export type PositionsObjectType = {
-  [position: string]: number
-}
-
-// Define a default padding value which will be used if no padding is provided
+// default padding value which will be used if no padding is provided
 const defaultPadding = 10
 
 /**
@@ -184,46 +183,29 @@ const defaultPadding = 10
  * @returns {[number, number]} - An array of two numbers representing the vertical and horizontal padding respectively.
  */
 export function getPadding(
-  padding: number | [number, number] = defaultPadding
-): [number, number] {
-  // Check if the padding is provided as an array (meaning separate vertical and horizontal values are provided)
+  padding: number | number[] = defaultPadding
+): number[] {
+  // Check if the padding is an array (multiple values).
   if (Array.isArray(padding)) {
-    // If the first value in the array is defined, use it as the vertical padding
-    if (padding[0]) {
-      // If the second value is also defined, use it as the horizontal padding
-      // If not, use the first value for both vertical and horizontal padding
-      return [padding[0], padding[1] ? padding[1] : padding[0]]
-    } else {
-      // If the first value is not defined, fall back to the default padding for both vertical and horizontal
-      return [defaultPadding, defaultPadding]
+    // Case 1: Single value in the array - use this value for all sides.
+    if (padding.length === 1) {
+      return [padding[0], padding[0], padding[0], padding[0]]
     }
+    // Case 2: Two values in the array - interpret as vertical and horizontal paddings.
+    if (padding.length === 2) {
+      return [padding[1], padding[0], padding[1], padding[0]]
+    }
+    // Case 3: Three values in the array - interpret as top, horizontal, and bottom paddings.
+    if (padding.length === 3) {
+      return [padding[0], padding[1], padding[2], padding[1]]
+    }
+    // Case 4: More than three values - use the first four values for top, right, bottom, and left paddings.
+    if (padding.length > 3) {
+      return [padding[0], padding[1], padding[2], padding[3]]
+    }
+    // Default case for arrays: use the default padding value for all sides.
+    return [defaultPadding, defaultPadding]
   }
-  // If padding is a single number, use it for both vertical and horizontal padding
-  return [padding, padding]
-}
-
-/**
- * `CoordType` is a TypeScript type that defines an array of numbers.
- * It can represent a coordinate as a list of numeric values.
- * For example, a point in 2D space could be represented as [10, 20].
- */
-export type CoordType = number[]
-
-/**
- * `CoordsObjectType` is a TypeScript type that defines an object type.
- * This object has string keys (representing positions) and values of type `CoordType` (number arrays representing coordinates).
- * For example, an object of this type could look like: { topLeft: [0, 0], bottomRight: [100, 100] }.
- */
-export type CoordsObjectType = {
-  [position: string]: CoordType
-}
-
-export {
-  Portal,
-  Observables,
-  useRect,
-  useElemRect,
-  RectResult,
-  getRect,
-  smoothScroll,
+  // If padding is a single number, use it for all sides.
+  return [padding, padding, padding, padding]
 }
