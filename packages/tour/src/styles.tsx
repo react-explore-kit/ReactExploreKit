@@ -85,10 +85,11 @@ export const defaultStyles: Styles = {
     transition: 'opacity 0.3s, transform 0.3s',
     cursor: disabled ? 'not-allowed' : 'pointer',
     transform: `scale(${current ? 1.25 : 1})`,
-    color: current ? 'var(--reactour-accent, #007aff)' : '#caccce',
-    background: current ? 'var(--reactour-accent, #007aff)' : 'none',
+    color: current ? 'var(--react-explore-kit-accent, #007aff)' : '#caccce',
+    background: current ? 'var(--react-explore-kit-accent, #007aff)' : 'none',
   }),
   close: ({ disabled }) => ({
+    color: 'var(--rt-close-btn)',
     position: 'absolute',
     top: 22,
     right: 22,
@@ -96,6 +97,10 @@ export const defaultStyles: Styles = {
     height: 9,
     '--rt-close-btn': disabled ? '#caccce' : '#5e5e5e',
     '--rt-close-btn-disabled': disabled ? '#caccce' : '#000',
+
+    '&:hover': {
+      color: 'var(--rt-close-btn-disabled)',
+    },
   }),
   svg: () => ({
     display: 'block',

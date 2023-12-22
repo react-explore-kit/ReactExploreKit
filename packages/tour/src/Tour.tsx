@@ -171,7 +171,7 @@ const Tour: React.FC<TourProps> = ({
           padding={transition ? 0 : maskPadding}
           highlightedAreaClassName={highlightedMaskClassName}
           className={maskClassName}
-          onClickHighlighted={e => {
+          onClickHighlighted={(e: any) => {
             e.preventDefault()
             e.stopPropagation()
             if (onClickHighlighted)

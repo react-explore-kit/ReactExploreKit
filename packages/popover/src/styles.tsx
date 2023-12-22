@@ -33,6 +33,22 @@ export const defaultStyles: Styles = {
     transition: 'transform 0.3s',
     top: 0,
     left: 0,
+
+    // Using '&:after' to target the pseudo-element in CSS-in-JS syntax
+    '&:after': {
+      content: '""', // Note the double quotes inside single quotes
+      width: 0,
+      height: 0,
+      position: 'absolute',
+      top: 'var(--rtp-arrow-top, auto)',
+      right: 'var(--rtp-arrow-right, auto)',
+      bottom: 'var(--rtp-arrow-bottom, auto)',
+      left: 'var(--rtp-arrow-left, auto)',
+      borderTop: 'var(--rtp-arrow-border-top)',
+      borderRight: 'var(--rtp-arrow-border-right)',
+      borderBottom: 'var(--rtp-arrow-border-bottom)',
+      borderLeft: 'var(--rtp-arrow-border-left)',
+    },
   }),
 }
 

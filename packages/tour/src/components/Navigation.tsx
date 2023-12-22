@@ -22,10 +22,8 @@ const Navigation: React.FC<NavigationProps> = ({
   rtl,
   Arrow = DefaultArrow,
 }) => {
-  // Gets the total number of steps.
   const stepsLength = steps.length
 
-  // This function matches styles passed to the component with default styles.
   const getStyles = stylesMatcher(styles)
 
   // Internal component `Button` handles rendering of navigation buttons (Next & Previous).
@@ -53,7 +51,6 @@ const Navigation: React.FC<NavigationProps> = ({
       }
     }
 
-    // Returns the button JSX, with either an Arrow icon or custom children, based on the props.
     return (
       <button
         style={getStyles('button', {
@@ -86,7 +83,6 @@ const Navigation: React.FC<NavigationProps> = ({
     )
   }
 
-  // The main render of the Navigation component
   return (
     <div style={getStyles('controls', {})} dir={rtl ? 'rtl' : 'ltr'}>
       {!hideButtons ? (
@@ -104,7 +100,7 @@ const Navigation: React.FC<NavigationProps> = ({
         )
       ) : null}
 
-      {!hideDots && (
+      {!hideDots ? (
         <div style={getStyles('navigation', {})}>
           {Array.from({ length: stepsLength }, (_, i) => i).map(index => {
             return (
@@ -124,7 +120,7 @@ const Navigation: React.FC<NavigationProps> = ({
             )
           })}
         </div>
-      )}
+      ) : null}
 
       {!hideButtons ? (
         nextButton && typeof nextButton === 'function' ? (

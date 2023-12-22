@@ -8,7 +8,6 @@ import {
 } from '@react-explore-kit/utils'
 
 const Mask: React.FC<MaskProps> = ({
-  // These are the props the component accepts, with their default values.
   padding = 10,
   wrapperPadding = 0,
   onClick,
@@ -28,19 +27,20 @@ const Mask: React.FC<MaskProps> = ({
   const getStyles = stylesMatcher(styles)
 
   // Calculate padding values from the padding prop.
-  const [px, py] = getPadding(padding)
-  const [wpx, wpy] = getPadding(wrapperPadding)
+  const [pt, pr, pb, pl] = getPadding(padding)
+  const [wpt, wpr, wpb, wpl] = getPadding(wrapperPadding)
 
   // Get the window dimensions and calculate dimensions for the mask.
   const { w, h } = getWindow()
-  const width = safe(sizes?.width + px * 2)
-  const height = safe(sizes?.height + py * 2)
-  const top = safe(sizes?.top - py - wpy / 2)
-  const left = safe(sizes?.left - px - wpx / 2)
-  const windowWidth = w - wpx
-  const windowHeight = h - wpy
+  const width = safe(sizes?.width + pl + pr)
+  const height = safe(sizes?.height + pt + pb)
+  const top = safe(sizes?.top - pt - wpt)
+  const left = safe(sizes?.left - pl - wpl)
+  const windowWidth = w - wpl - wpr
+  const windowHeight = h - wpt - wpb
 
   // Calculate the styles for the area covered by the mask.
+
   const maskAreaStyles = getStyles('maskArea', {
     x: left,
     y: top,
@@ -48,15 +48,19 @@ const Mask: React.FC<MaskProps> = ({
     height,
   })
 
-  // Return the JSX for the Mask component.
+  const highlightedAreaStyles = getStyles('highlightedArea', {
+    x: left,
+    y: top,
+    width,
+    height,
+  })
+
   return (
     <div
-      // Outer wrapper of the mask with a click handler and optional className.
       style={getStyles('maskWrapper', {})}
       onClick={onClick}
       className={className}
     >
-      {/* SVG for the mask and highlighted area */}
       <svg
         width={windowWidth}
         height={windowHeight}
@@ -64,11 +68,10 @@ const Mask: React.FC<MaskProps> = ({
         style={getStyles('svgWrapper', {
           windowWidth,
           windowHeight,
-          wpx,
-          wpy,
+          wpt,
+          wpl,
         })}
       >
-        {/* Definitions for the SVG (mask and clipPath) */}
         <defs>
           <mask id={maskID}>
             {/* White rectangle covers the whole window */}
@@ -88,11 +91,13 @@ const Mask: React.FC<MaskProps> = ({
           </mask>
           <clipPath id={clipID}>
             {/* Polygon that represents the clickable area */}
-            <polygon points={`...`} />
+            <polygon
+              points={`0 0, 0 ${windowHeight}, ${left} ${windowHeight}, ${left} ${top}, ${left +
+                width} ${top}, ${left + width} ${top + height}, ${left} ${top +
+                height}, ${left} ${windowHeight}, ${windowWidth} ${windowHeight}, ${windowWidth} 0`}
+            />
           </clipPath>
         </defs>
-
-        {/* Rectangle that represents the masked area */}
         <rect
           style={getStyles('maskRect', {
             windowWidth,
@@ -100,7 +105,7 @@ const Mask: React.FC<MaskProps> = ({
             maskID,
           })}
         />
-        {/* Rectangle that represents the clickable area */}
+        {/* The clickable area */}
         <rect
           style={getStyles('clickArea', {
             windowWidth,
@@ -112,16 +117,11 @@ const Mask: React.FC<MaskProps> = ({
             clipID,
           })}
         />
-        {/* Rectangle for the highlighted area with a click handler */}
         <rect
-          style={getStyles('highlightedArea', {
-            x: left,
-            y: top,
-            width,
-            height,
-          })}
+          style={highlightedAreaStyles}
           className={highlightedAreaClassName}
           onClick={onClickHighlighted}
+          rx={highlightedAreaStyles.rx ? 1 : undefined}
         />
       </svg>
     </div>

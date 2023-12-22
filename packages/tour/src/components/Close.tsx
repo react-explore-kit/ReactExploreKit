@@ -14,7 +14,7 @@ const Close: React.FC<CloseProps> = ({
       className="react-explore-kit__close-button"
       style={{
         ...getStyles('button', {}),
-        ...getStyles('close', { disabled }), // 'disabled' state is used to potentially alter the style
+        ...getStyles('close', { disabled }),
       }}
       onClick={onClick}
       {...props}

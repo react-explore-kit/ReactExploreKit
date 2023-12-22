@@ -1,6 +1,5 @@
 import Tour from './Tour'
 import TourContext, { TourProvider, useTour } from './Context'
-import './styles.css'
 
 export { default as withTour } from './withTour'
 export default Tour

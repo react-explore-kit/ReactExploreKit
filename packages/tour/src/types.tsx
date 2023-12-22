@@ -6,8 +6,8 @@ import {
 } from '@react-explore-kit/popover'
 import { MaskStylesObj } from '@react-explore-kit/mask'
 import { RectResult } from '@react-explore-kit/utils'
-import { PopoverComponentsType } from './components/index'
 import { StylesObj } from './styles'
+import { PopoverComponentsType } from './components/index'
 
 // SharedProps: Type defining common props used across different components
 type SharedProps = KeyboardHandler & {
@@ -197,4 +197,4 @@ export type NavButtonProps = {
   children?: any
 }
 
-export type { Position, StylesObj }
+export { Position, StylesObj }

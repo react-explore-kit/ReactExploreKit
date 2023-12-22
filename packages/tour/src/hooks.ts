@@ -116,7 +116,7 @@ export function useSizes(
    * Function to refresh the observable. This will recompute the dimensions of the target
    * and check if any highlighted elements are being observed.
    */
-  function observableRefresher() {
+  const observableRefresher = useCallback(() => {
     setObserving(true)
     const { hasHighligtedElems, ...dimesions } = getHighlightedRect(
       target,
@@ -126,9 +126,8 @@ export function useSizes(
     setIsHighlightingObserved(hasHighligtedElems)
     setDimensions(dimesions)
     setObserving(false)
-  }
+  }, [target, step?.highlightedSelectors, dimensions])
 
-  // Return values from the hook
   return {
     sizes: dimensions,
     transition,
@@ -185,7 +184,6 @@ function getHighlightedRect(
   // Iterate over the highlighted selectors to adjust the alternative rectangle based on visible elements
   for (const selector of highlightedSelectors) {
     const element = document.querySelector(selector) as HTMLElement
-    // Skip hidden elements
     if (
       !element ||
       element.style.display === 'none' ||
@@ -194,65 +192,63 @@ function getHighlightedRect(
       continue
     }
 
-    // Get the rectangle of the current highlighted element
     const rect = getRect(element)
-
-    // Update the flag since a visible highlighted element is found
     hasHighligtedElems = true
-
-    // Calculate the combined rectangle based on the current element's rectangle
     if (bypassElem || !node) {
-      // If bypassing the main node's rectangle, or if the main node is null, adjust the alternative rectangle
-      altAttrs = calculateCombinedRect(altAttrs, rect)
+      if (rect.top < altAttrs.top) {
+        altAttrs.top = rect.top
+      }
+
+      if (rect.right > altAttrs.right) {
+        altAttrs.right = rect.right
+      }
+
+      if (rect.bottom > altAttrs.bottom) {
+        altAttrs.bottom = rect.bottom
+      }
+
+      if (rect.left < altAttrs.left) {
+        altAttrs.left = rect.left
+      }
+
+      altAttrs.width = altAttrs.right - altAttrs.left
+      altAttrs.height = altAttrs.bottom - altAttrs.top
     } else {
-      // Otherwise, adjust the main node's rectangle
-      attrs = calculateCombinedRect(attrs, rect)
+      if (rect.top < attrs.top) {
+        attrs.top = rect.top
+      }
+
+      if (rect.right > attrs.right) {
+        attrs.right = rect.right
+      }
+
+      if (rect.bottom > attrs.bottom) {
+        attrs.bottom = rect.bottom
+      }
+
+      if (rect.left < attrs.left) {
+        attrs.left = rect.left
+      }
+
+      attrs.width = attrs.right - attrs.left
+      attrs.height = attrs.bottom - attrs.top
     }
   }
 
-  // Determine if the alternative rectangle should be used (bypassing the main node's rectangle)
   const bypassable =
     bypassElem || !node ? altAttrs.width > 0 && altAttrs.height > 0 : false
 
-  // Return the calculated rectangle and additional information
   return {
-    ...(!bypassable ? attrs : altAttrs),
+    left: (bypassable ? altAttrs : attrs).left,
+    top: (bypassable ? altAttrs : attrs).top,
+    right: (bypassable ? altAttrs : attrs).right,
+    bottom: (bypassable ? altAttrs : attrs).bottom,
+    width: (bypassable ? altAttrs : attrs).width,
+    height: (bypassable ? altAttrs : attrs).height,
     windowWidth,
     windowHeight,
     hasHighligtedElems,
     x: attrs.x,
     y: attrs.y,
   }
-}
-
-/**
- * Helper function to calculate the combined rectangle of two rectangles.
- *
- * @param {object} rect1 - The first rectangle.
- * @param {object} rect2 - The second rectangle.
- * @returns {object} - The combined rectangle.
- */
-function calculateCombinedRect(rect1: any, rect2: any) {
-  const combinedRect = { ...rect1 }
-
-  if (rect2.top < combinedRect.top) {
-    combinedRect.top = rect2.top
-  }
-
-  if (rect2.right > combinedRect.right) {
-    combinedRect.right = rect2.right
-  }
-
-  if (rect2.bottom > combinedRect.bottom) {
-    combinedRect.bottom = rect2.bottom
-  }
-
-  if (rect2.left < combinedRect.left) {
-    combinedRect.left = rect2.left
-  }
-
-  combinedRect.width = combinedRect.right - combinedRect.left
-  combinedRect.height = combinedRect.bottom - combinedRect.top
-
-  return combinedRect
 }
